@@ -51,6 +51,7 @@ img:hover{
     text-align: center;
     border: none;
     background-color: white;
+    height: fit-content;
 }
 .btuClass:hover{
     background-color: black;
@@ -77,4 +78,11 @@ footer {
 }
 p {
     padding-top: 25px;
+}
+#chartSec {
+    background-color: white;
+}
+.blinkClass {
+    background-color: red;
+    color: white;
 }

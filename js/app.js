@@ -10,6 +10,7 @@ let secondImgIndex;
 let thirdImgIndex;
 let btu = document.getElementById('btu');
 let unList = document.getElementById('unList');
+let showedArray = [];
 // let p1 = -1;
 // let p2 = -1;
 // let p3 = -1;
@@ -21,8 +22,12 @@ function Images(name, alt, source) {
     this.vote = 0;
     this.seen = 0;
     Images.all.push(this);
+    Images.allNames.push(this.name);
 }
+Images.allNames = [];
 Images.all = [];
+let allSeen = [];
+let allVote = [];
 new Images('bag', 'image1', 'img/bag.jpg');
 new Images('banana', 'image2', 'img/banana.jpg');
 new Images('bathroom', 'image3', 'img/bathroom.jpg');
@@ -43,6 +48,162 @@ new Images('unicorn', 'image17', 'img/unicorn.jpg');
 new Images('usb', 'image18', 'img/usb.gif');
 new Images('water-can', 'image19', 'img/water-can.jpg');
 new Images('wine-glass', 'image20', 'img/wine-glass.jpg');
+checkImages();
+let section = document.getElementById("imageSec");
+section.addEventListener('click', imagesControl);
+function imagesControl(event){
+    let index = clickedImage(event.target.alt);
+    if (typeof index == "number"){
+        Images.all[index].vote++;
+        attemptCounter++
+        checkImages();
+        if (attemptCounter < numberOfAttempt){
+        } else {
+            section.removeEventListener('click', imagesControl);
+            btu.addEventListener('click', showResults);
+            btu.classList.add('blinkClass');
+            setTimeout(blink, 750);
+            btu.classList.add('btuClass');
+            for (let i = 0; i < Images.all.length; i++){
+                allSeen.push(Images.all[i].seen);
+                allVote.push(Images.all[i].vote);
+            }
+        }
+    }else {}
+}
+let chartSec = document.getElementById('chartSec');
+let canvas = document.createElement('canvas');
+canvas.setAttribute('id','myChart');
+let on = false;
+function showResults(event){
+    // showing a list for results
+    // if (unList.firstChild) {
+    //     while (unList.firstChild) {
+    //         unList.removeChild(unList.firstChild);
+    //     }
+    // } else {
+    //     for (let i = 0; i < Images.all.length; i++) {
+    //         let list = document.createElement('li');
+    //         unList.appendChild(list);
+    //         list.textContent = `${Images.all[i].name} had ${Images.all[i].vote} votes, and seen ${Images.all[i].seen} times`
+    //     }
+    // }
+
+    // showing a chart
+    if (on == true){
+        while(chartSec.firstChild){
+            chartSec.removeChild(chartSec.firstChild);
+        }
+        on = false;
+    } else {
+        chartSec.appendChild(canvas);
+        addChart();
+        on = true;
+    }
+}
+function addChart(){
+    let ctx = document.getElementById('myChart').getContext('2d');
+    let chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'bar',
+
+    // The data for our dataset
+    data: {
+        labels: Images.allNames,
+        datasets: [{
+            label: 'seen',
+            backgroundColor: 'rgb(153, 255, 255)',
+            borderColor: 'rgb(153, 255, 255)',
+            data: allSeen
+        },
+        {
+            label: 'votes',
+            backgroundColor: 'rgb(224, 224, 224)',
+            borderColor: 'rgb(224, 224, 224)',
+            data: allVote
+        }]
+    },
+
+    // Configuration options go here
+    options: {}
+});
+}
+///////////////////////////////////////////////////////////////////////////
+// images render function 1
+function checkImages() {
+    let notCheck1;
+    let notCheck2;
+    let notCheck3;
+    let firstValue = true;
+    let secondValue = true;
+    let thirdValue = true;
+    do {
+        // change the index
+        do {
+            if (firstValue) {
+                firstImgIndex = Math.floor(Math.random() * Images.all.length);
+            }
+            if (secondValue) {
+                secondImgIndex = Math.floor(Math.random() * Images.all.length);
+            }
+            if (thirdValue) {
+                thirdImgIndex = Math.floor(Math.random() * Images.all.length);
+            }
+        } while (firstImgIndex == secondImgIndex || firstImgIndex == thirdImgIndex || secondImgIndex == thirdImgIndex)
+        // check if the three index if they are repeated 
+        if (showedArray.includes(firstImgIndex,0)){
+            notCheck1 = true;
+        } else {
+            notCheck1 = false;
+            firstValue = false;
+        }
+        if (showedArray.includes(secondImgIndex,0)){
+            notCheck2 = true;
+        } else {
+            notCheck2 = false;
+            secondValue = false;
+        }
+        if (showedArray.includes(thirdImgIndex,0)){
+            notCheck3 = true;
+        } else {
+            notCheck3 = false;
+            thirdValue = false;
+        }
+    } while (notCheck1 || notCheck2 || notCheck3)
+    // empty the showed array
+    if (showedArray.length == 3){
+        for (let i = 0; i < 3; i++){
+            showedArray.pop();
+        }
+    }
+    firstImage.src = Images.all[firstImgIndex].source;
+    secondImage.src = Images.all[secondImgIndex].source;
+    thirdImage.src = Images.all[thirdImgIndex].source;
+    firstImage.alt = Images.all[firstImgIndex].alt;
+    secondImage.alt = Images.all[secondImgIndex].alt;
+    thirdImage.alt = Images.all[thirdImgIndex].alt;
+    Images.all[firstImgIndex].seen++;
+    Images.all[secondImgIndex].seen++;
+    Images.all[thirdImgIndex].seen++;
+    showedArray.push(firstImgIndex);
+    showedArray.push(secondImgIndex);
+    showedArray.push(thirdImgIndex);
+    // check the function
+    // if (p1 == firstImgIndex || p1 == secondImgIndex || p1 == thirdImgIndex){
+    //     console.log('alert');
+    // }
+    // if (p2 == firstImgIndex || p2 == secondImgIndex || p2 == thirdImgIndex){
+    //     console.log('alert');
+    // }
+    // if (p3 == firstImgIndex || p3 == secondImgIndex || p3 == thirdImgIndex){
+    //     console.log('alert');
+    // }
+    // p1 = firstImgIndex;
+    // p2 = secondImgIndex;
+    // p3 = thirdImgIndex;
+}
+
+// images render function 2
 function imagesRender(){
     let notCheck1;
     let notCheck2;
@@ -113,151 +274,76 @@ function imagesRender(){
     // p2 = secondImgIndex;
     // p3 = thirdImgIndex;
 }
-imagesRender();
-let section = document.getElementById("imageSec");
-section.addEventListener('click', imagesControl);
-function imagesControl(event) {
-    if (event.target.alt) {
-        switch (event.target.alt) {
+
+// what image is clicked
+function clickedImage(alt){
+    let index = '';
+    if (alt) {
+        switch (alt) {
             case 'image1':
-                Images.all[0].vote++;
+                index = 0;
                 break;
             case 'image2':
-                Images.all[1].vote++;
+                index = 1;
                 break;
             case 'image3':
-                Images.all[2].vote++;
+                index = 2;
             case 'image4':
-                Images.all[3].vote++;
+                index = 3;
                 break;
             case 'image5':
-                Images.all[4].vote++;
+                index = 4;
                 break;
             case 'image6':
-                Images.all[5].vote++;
+                index = 5;
                 break;
             case 'image7':
-                Images.all[6].vote++;
+                index = 6;
                 break;
             case 'image8':
-                Images.all[7].vote++;
+                index = 7;
                 break;
             case 'image9':
-                Images.all[8].vote++;
+                index = 8;
                 break;
             case 'image10':
-                Images.all[9].vote++;
+                index = 9;
                 break;
             case 'image11':
-                Images.all[10].vote++;
+                index = 10;
                 break;
             case 'image12':
-                Images.all[11].vote++;
+                index = 11;
                 break;
             case 'image13':
-                Images.all[12].vote++;
+                index = 12;
                 break;
             case 'image14':
-                Images.all[13].vote++;
+                index = 13;
                 break;
             case 'image15':
-                Images.all[14].vote++;
+                index = 14;
                 break;
             case 'image16':
-                Images.all[15].vote++;
+                index = 15;
                 break;
             case 'image17':
-                Images.all[16].vote++;
+                index = 16;
                 break;
             case 'image18':
-                Images.all[17].vote++;
+                index = 17;
                 break;
             case 'image19':
-                Images.all[18].vote++;
+                index = 18;
                 break;
             default:
-                Images.all[19].vote++;
+                index = 19;
                 break;
-        }
-        attemptCounter++
-        imagesRender();
-        if (attemptCounter < numberOfAttempt) {
-
-        } else {
-            section.removeEventListener('click', imagesControl);
-            btu.addEventListener('click', showResults);
-            btu.classList.add('btuClass');
-        }
-    } else {
-
-    }
-}
-function showResults(event) {
-    if (unList.firstChild) {
-        while (unList.firstChild) {
-            unList.removeChild(unList.firstChild);
-        }
-    } else {
-        for (let i = 0; i < Images.all.length; i++) {
-            let list = document.createElement('li');
-            unList.appendChild(list);
-            list.textContent = `${Images.all[i].name} had ${Images.all[i].vote} votes, and seen ${Images.all[i].seen} times`
         }
     }
+    return index;
 }
-///////////////////////////////////////////////////////////////////////////
-function checkImages(index1, index2, index3) {
-    let whileValue1 = false;
-    let whileValue2 = false;
-    let whileValue3 = false;
-    let firstValue = true;
-    let secondValue = true;
-    let thirdValue = true;
-    do {
-        do {
-            if (firstValue == true) {
-                firstImgIndex = Math.floor(Math.random() * Images.all.length);
-            }
-            if (secondValue == true) {
-                secondImgIndex = Math.floor(Math.random() * Images.all.length);
-            }
-            if (thirdValue == true) {
-                thirdImgIndex = Math.floor(Math.random() * Images.all.length);
-            }
-        } while (firstImgIndex == secondImgIndex || firstImgIndex == thirdImgIndex || secondImgIndex == thirdImgIndex)
-        switch (firstImgIndex) {
-            case index1, index2, index3:
-                whileValue1 = true;
-                break;
-            default:
-                firstValue = false;
-                whileValue1 = false;
-        }
-        switch (secondImgIndex) {
-            case index1, index2, index3:
-                whileValue2 = true;
-                break;
-            default:
-                secondValue = false;
-                whileValue2 = false;
-        }
-        switch (thirdImgIndex) {
-            case index1, index2, index3:
-                whileValue3 = true;
-                break;
-            default:
-                thirdValue = false;
-                whileValue3 = false;
-        }
-    } while (whileValue1 || whileValue2 || whileValue3)
-    firstImage.src = Images.all[firstImgIndex].source;
-    secondImage.src = Images.all[secondImgIndex].source;
-    thirdImage.src = Images.all[thirdImgIndex].source;
-    firstImage.alt = Images.all[firstImgIndex].alt;
-    secondImage.alt = Images.all[secondImgIndex].alt;
-    thirdImage.alt = Images.all[thirdImgIndex].alt;
-    Images.all[firstImgIndex].seen++;
-    Images.all[secondImgIndex].seen++;
-    Images.all[thirdImgIndex].seen++;
+function blink(){
+    btu.classList.remove('blinkClass');
 }
 ///////////////////////////////////////////////////////////////////////////
