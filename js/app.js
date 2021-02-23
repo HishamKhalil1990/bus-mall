@@ -68,6 +68,7 @@ function imagesControl(event){
                 allSeen.push(Images.all[i].seen);
                 allVote.push(Images.all[i].vote);
             }
+            save();
         }
     }else {}
 }
@@ -85,7 +86,7 @@ function showResults(event){
     //     for (let i = 0; i < Images.all.length; i++) {
     //         let list = document.createElement('li');
     //         unList.appendChild(list);
-    //         list.textContent = `${Images.all[i].name} had ${Images.all[i].vote} votes, and seen ${Images.all[i].seen} times`
+    //         list.textContent = `${Images.all[i].name} had ${Images.allVote[i]} votes, and seen ${Images.allSeen[i]} times`
     //     }
     // }
 
@@ -345,5 +346,28 @@ function clickedImage(alt){
 }
 function blink(){
     btu.classList.remove('blinkClass');
+}
+function save(){
+    let storedData;
+    let parsedStoredData  = { seen:[] , vote:[]};
+    console.log();
+    if (localStorage.getItem('data') !== null){
+        storedData = localStorage.getItem('data');
+        parsedStoredData = JSON.parse(storedData);
+        // console.log('this is temp seen',parsedStoredData.seen);
+        // console.log('this current seen',allSeen);
+        // console.log('this temp vote',parsedStoredData.vote);
+        // console.log('this current vote',allVote)
+        for (let i = 0 ; i < Images.all.length ; i++){
+            allSeen[i] += parsedStoredData.seen[i];
+            allVote[i] += parsedStoredData.vote[i];
+        }
+        // console.log('this new seen',allSeen);
+        // console.log('this new vote',allVote)
+    }
+    parsedStoredData.seen = allSeen;
+    parsedStoredData.vote = allVote;
+    let newDataToStore =JSON.stringify(parsedStoredData);
+    localStorage.setItem('data',newDataToStore);
 }
 ///////////////////////////////////////////////////////////////////////////
